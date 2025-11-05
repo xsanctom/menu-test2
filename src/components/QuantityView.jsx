@@ -115,11 +115,27 @@ function QuantityView() {
   const calculateBadgePositions = useCallback(() => {
     if (!quantityViewRef.current || !tableWrapperRef.current) return;
     
+    // Generate current visible dates to filter refs
+    const visibleDates = new Set();
+    for (let i = 0; i < visibleDays; i++) {
+      const date = new Date(currentStartDate);
+      date.setDate(date.getDate() + i);
+      visibleDates.add(date.toISOString());
+    }
+    
     const viewRect = quantityViewRef.current.getBoundingClientRect();
     const positions = [];
     
     Object.entries(headerCellRefs.current).forEach(([key, cellRef]) => {
       if (!cellRef) return;
+      
+      // Extract date from key (format: "today-2024-01-15T00:00:00.000Z" or "month-2024-01-15T00:00:00.000Z")
+      const dateMatch = key.match(/(today|month)-(.*)/);
+      if (!dateMatch) return;
+      
+      const dateISO = dateMatch[2];
+      // Only process refs for currently visible dates
+      if (!visibleDates.has(dateISO)) return;
       
       const cellRect = cellRef.getBoundingClientRect();
       const top = cellRect.top - viewRect.top - 8; // -8px to position above
@@ -135,13 +151,15 @@ function QuantityView() {
     });
     
     setBadgePositions(positions);
-  }, []);
+  }, [currentStartDate, visibleDays]);
 
   // Update badge positions on mount, scroll, resize, and date changes
   useEffect(() => {
-    // Use RAF to ensure DOM has updated with new columns before calculating positions
+    // Use double RAF to ensure DOM is fully updated AND refs are assigned before calculating positions
     requestAnimationFrame(() => {
-      calculateBadgePositions();
+      requestAnimationFrame(() => {
+        calculateBadgePositions();
+      });
     });
     
     const tableWrapper = tableWrapperRef.current;
@@ -203,7 +221,12 @@ function QuantityView() {
                 
                 // Store ref for cells with badges
                 const needsRef = col.isToday || col.isNewMonth;
-                const refKey = col.isToday ? `today-${idx}` : col.isNewMonth ? `month-${idx}` : null;
+                // Use date-based keys to prevent collisions when navigating
+                const refKey = col.isToday 
+                  ? `today-${col.date.toISOString()}` 
+                  : col.isNewMonth 
+                    ? `month-${col.date.toISOString()}` 
+                    : null;
                 
                 return (
                   <th 
@@ -215,6 +238,9 @@ function QuantityView() {
                         if (col.isNewMonth) {
                           el.dataset.monthName = col.monthName;
                         }
+                      } else {
+                        // Cleanup on unmount
+                        delete headerCellRefs.current[refKey];
                       }
                     } : null}
                   >

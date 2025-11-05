@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 function Sidebar() {
   const [venueDropdownOpen, setVenueDropdownOpen] = useState(false);
+  const [venueSearchQuery, setVenueSearchQuery] = useState('');
+  const [currentVenue, setCurrentVenue] = useState('Sakura Tokyo');
   const [searchQuery, setSearchQuery] = useState('');
+  const venueDropdownRef = useRef(null);
   const [expandedMenus, setExpandedMenus] = useState({
     engagement: false,
     messaging: false,
@@ -13,9 +16,25 @@ function Sidebar() {
 
   const venues = [
     { name: 'Sakura Tokyo', location: 'Tokyo, Japan', status: 'Current' },
-    { name: 'Blue Ocean', location: 'Sydney, Australia', status: 'Active' },
-    { name: 'Mountain View', location: 'Denver, USA', status: 'Active' },
+    { name: 'Sakura Shibuya', location: 'Tokyo, Japan', status: 'Active' },
+    { name: 'Sakura Shinjuku', location: 'Tokyo, Japan', status: 'Active' },
+    { name: 'Sakura Ginza', location: 'Tokyo, Japan', status: 'Active' },
+    { name: 'Sakura Roppongi', location: 'Tokyo, Japan', status: 'Active' },
+    { name: 'Sakura Harajuku', location: 'Tokyo, Japan', status: 'Active' },
+    { name: 'Sakura Osaka', location: 'Osaka, Japan', status: 'Active' },
+    { name: 'Sakura Kyoto', location: 'Kyoto, Japan', status: 'Active' },
+    { name: 'Sakura Yokohama', location: 'Yokohama, Japan', status: 'Active' },
+    { name: 'Sakura Fukuoka', location: 'Fukuoka, Japan', status: 'Active' },
+    { name: 'Sakura Sapporo', location: 'Sapporo, Japan', status: 'Active' },
+    { name: 'Sakura Nagoya', location: 'Nagoya, Japan', status: 'Active' },
+    { name: 'Sakura Sendai', location: 'Sendai, Japan', status: 'Active' },
   ];
+
+  // Filter venues based on search query
+  const filteredVenues = venues.filter(venue => {
+    const query = venueSearchQuery.toLowerCase();
+    return venue.name.toLowerCase().includes(query) || venue.location.toLowerCase().includes(query);
+  });
 
   const toggleMenu = (menuKey) => {
     setExpandedMenus(prev => ({
@@ -24,20 +43,37 @@ function Sidebar() {
     }));
   };
 
+  // Handle outside click for venue dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (venueDropdownRef.current && !venueDropdownRef.current.contains(event.target)) {
+        setVenueDropdownOpen(false);
+      }
+    };
+
+    if (venueDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [venueDropdownOpen]);
+
   return (
     <div className="sidebar">
       <div className="sidebar-top-container">
         {/* Venue Selector */}
-        <div className="venue-selector-container">
+        <div className="venue-selector-container" ref={venueDropdownRef}>
           <button
             className="venue-selector-button"
             onClick={() => setVenueDropdownOpen(!venueDropdownOpen)}
             aria-expanded={venueDropdownOpen}
           >
             <div className="venue-info">
-              <div className="venue-logo">S</div>
+              <div className="venue-logo">{currentVenue.charAt(0)}</div>
               <div className="venue-details">
-                <div className="venue-name">Sakura Tokyo</div>
+                <div className="venue-name">{currentVenue}</div>
               </div>
             </div>
             <svg className="venue-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -48,22 +84,43 @@ function Sidebar() {
           {venueDropdownOpen && (
             <div className="venue-dropdown">
               <div className="venue-dropdown-content">
+                {/* Search Input */}
+                <div className="venue-search-container">
+                  <input
+                    type="text"
+                    className="venue-search-input"
+                    placeholder="Search venues..."
+                    value={venueSearchQuery}
+                    onChange={(e) => setVenueSearchQuery(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+                
                 <div className="venue-list">
-                  {venues.map((venue, index) => (
-                    <div
-                      key={index}
-                      className={`venue-option ${index === 0 ? 'active' : ''}`}
-                      onClick={() => setVenueDropdownOpen(false)}
-                    >
-                      <div className="venue-option-info">
-                        <div className="venue-option-name">{venue.name}</div>
-                        <div className="venue-option-location">{venue.location}</div>
+                  {filteredVenues.length > 0 ? (
+                    filteredVenues.map((venue, index) => (
+                      <div
+                        key={index}
+                        className={`venue-option ${venue.name === currentVenue ? 'active' : ''}`}
+                        onClick={() => {
+                          setCurrentVenue(venue.name);
+                          setVenueDropdownOpen(false);
+                        }}
+                      >
+                        <div className="venue-option-info">
+                          <div className="venue-option-name">{venue.name}</div>
+                          <div className="venue-option-location">{venue.location}</div>
+                        </div>
+                        {venue.status === 'Current' && (
+                          <div className="venue-option-status">{venue.status}</div>
+                        )}
                       </div>
-                      {venue.status === 'Current' && (
-                        <div className="venue-option-status">{venue.status}</div>
-                      )}
+                    ))
+                  ) : (
+                    <div className="venue-no-matches">
+                      No venues found
                     </div>
-                  ))}
+                  )}
                 </div>
                 <div className="venue-settings">
                   <button className="venue-settings-button">

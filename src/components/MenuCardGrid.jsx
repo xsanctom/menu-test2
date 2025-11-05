@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMenu } from '../context/MenuContext';
 
-function MenuCardGrid() {
+function MenuCardGrid({ onEditItem }) {
   const { state } = useMenu();
 
   // Apply filters helper
@@ -12,9 +12,26 @@ function MenuCardGrid() {
         return false;
       }
 
-      // Status filter
-      if (state.filters.status.length > 0 && !state.filters.status.includes(item.status)) {
-        return false;
+      // Status filter - handle archived status specially
+      const statusFilters = state.filters.status || [];
+      const isArchived = item.status === 'Archived';
+      const hasArchivedFilter = statusFilters.includes('Archived');
+      const hasOtherStatusFilters = statusFilters.some(s => s !== 'Archived');
+
+      if (isArchived) {
+        // Archived items only show when Archived filter is active
+        if (!hasArchivedFilter) {
+          return false;
+        }
+      } else {
+        // Non-archived items: if Archived filter is active, exclude them
+        // If other status filters are active, check if item matches
+        if (hasArchivedFilter) {
+          return false;
+        }
+        if (hasOtherStatusFilters && !statusFilters.includes(item.status)) {
+          return false;
+        }
       }
 
       // Category filter
@@ -80,7 +97,12 @@ function MenuCardGrid() {
               {/* Cards */}
               <div className="menu-cards">
                 {filteredGroupedItems[category].map((item) => (
-                  <div key={item.id} className="menu-card">
+                  <div 
+                    key={item.id} 
+                    className="menu-card"
+                    onClick={() => onEditItem && onEditItem(item.id)}
+                    style={{ cursor: onEditItem ? 'pointer' : 'default' }}
+                  >
                     <div className="card-image">
                       {item.status && (
                         <span className={`status-tag status-${item.status.toLowerCase()}`}>
@@ -95,60 +117,12 @@ function MenuCardGrid() {
                     </div>
                     <div className="card-content">
                       <h3 className="card-title">{item.name}</h3>
-                      <p className="card-description">{item.description || 'No description'}</p>
-                      
-                      {/* Meals and Days Badges */}
-                      {(item.meals || item.days) && (
-                        <div className="chip-container" style={{ marginTop: '8px' }}>
-                          {/* Meals */}
-              {item.meals && (
-                <div className="chip-row">
-                  {(() => {
-                    const meals = Array.isArray(item.meals) ? item.meals : [item.meals];
-                    const allMeals = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Brunch'];
-                    const hasAllMeals = allMeals.every(meal => meals.includes(meal));
-                    
-                    if (hasAllMeals) {
-                      return <span className="chip-meal">All Meals</span>;
-                    }
-                    
-                    const mealAbbrev = (meal) => {
-                      return meal; // Display full meal names
-                    };
-                    return meals.filter(Boolean).map((meal, idx) => (
-                      <span key={idx} className="chip-meal">{mealAbbrev(meal)}</span>
-                    ));
-                  })()}
-                </div>
-              )}
-                          
-                          {/* Days */}
-              {item.days && (
-                <div className="chip-row">
-                  {(() => {
-                    const days = Array.isArray(item.days) ? item.days : [item.days];
-                    const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                    const hasAllDays = allDays.every(day => days.includes(day));
-                    
-                    if (hasAllDays) {
-                      return <span className="chip-day">All Days</span>;
-                    }
-                    
-                    const dayAbbrev = (day) => {
-                      const abbrevs = { 'Sunday': 'Su', 'Monday': 'M', 'Tuesday': 'Tu', 'Wednesday': 'W', 'Thursday': 'Th', 'Friday': 'F', 'Saturday': 'Sa' };
-                      return abbrevs[day] || day.slice(0, 2);
-                    };
-                    return days.filter(Boolean).map((day, idx) => (
-                      <span key={idx} className="chip-day">{dayAbbrev(day)}</span>
-                    ));
-                  })()}
-                </div>
-              )}
-                        </div>
+                      {item.tagline && (
+                        <p className="card-description">{item.tagline}</p>
                       )}
                       
                       <div className="preview-price-row">
-                        <span className="preview-price">${item.price || '0'}</span>
+                        <span className="preview-price">¥{item.price || '0'}</span>
                       </div>
                     </div>
                   </div>

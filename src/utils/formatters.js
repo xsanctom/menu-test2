@@ -5,10 +5,10 @@
 /**
  * Format price with currency symbol
  * @param {number} price - Price value
- * @param {string} currency - Currency symbol (default: $)
+ * @param {string} currency - Currency symbol (default: ¥)
  * @returns {string} Formatted price
  */
-export function formatPrice(price, currency = '$') {
+export function formatPrice(price, currency = '¥') {
   if (typeof price !== 'number') {
     price = parseFloat(price) || 0;
   }

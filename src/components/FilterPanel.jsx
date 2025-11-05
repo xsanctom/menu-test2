@@ -53,11 +53,26 @@ function FilterPanel({ isOpen, onClose }) {
   const handleToggleFilter = (category, option) => {
     const newFilters = { ...localFilters };
     const currentOptions = newFilters[category] || [];
+    const isArchived = option === 'Archived';
+    const regularStatuses = ['Online', 'Hidden', 'Manager Only', 'Disabled'];
     
     if (currentOptions.includes(option)) {
+      // Unchecking - just remove the option
       newFilters[category] = currentOptions.filter(o => o !== option);
     } else {
-      newFilters[category] = [...currentOptions, option];
+      // Checking - implement mutually exclusive logic for status category
+      if (category === 'status') {
+        if (isArchived) {
+          // If selecting Archived, clear all other statuses
+          newFilters[category] = ['Archived'];
+        } else {
+          // If selecting a regular status, clear Archived if present
+          newFilters[category] = [...currentOptions.filter(o => o !== 'Archived'), option];
+        }
+      } else {
+        // For other categories, use normal multi-select
+        newFilters[category] = [...currentOptions, option];
+      }
     }
     
     setLocalFilters(newFilters);
@@ -117,16 +132,43 @@ function FilterPanel({ isOpen, onClose }) {
         <div className="filter-content">
           <h3>{FILTER_CATEGORIES[activeCategory].label}</h3>
           <div className="filter-options">
-            {FILTER_CATEGORIES[activeCategory].options.map((option) => (
-              <label key={option} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={localFilters[activeCategory]?.includes(option) || false}
-                  onChange={() => handleToggleFilter(activeCategory, option)}
-                />
-                <span>{option}</span>
-              </label>
-            ))}
+            {activeCategory === 'status' ? (
+              <>
+                {/* Regular Status Options */}
+                {FILTER_CATEGORIES[activeCategory].options.map((option) => (
+                  <label key={option} className="filter-option">
+                    <input
+                      type="checkbox"
+                      checked={localFilters[activeCategory]?.includes(option) || false}
+                      onChange={() => handleToggleFilter(activeCategory, option)}
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+                {/* Divider */}
+                <div className="filter-option-divider"></div>
+                {/* Archived Option */}
+                <label className="filter-option">
+                  <input
+                    type="checkbox"
+                    checked={localFilters[activeCategory]?.includes('Archived') || false}
+                    onChange={() => handleToggleFilter(activeCategory, 'Archived')}
+                  />
+                  <span>Archived</span>
+                </label>
+              </>
+            ) : (
+              FILTER_CATEGORIES[activeCategory].options.map((option) => (
+                <label key={option} className="filter-option">
+                  <input
+                    type="checkbox"
+                    checked={localFilters[activeCategory]?.includes(option) || false}
+                    onChange={() => handleToggleFilter(activeCategory, option)}
+                  />
+                  <span>{option}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
       </div>

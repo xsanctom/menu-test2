@@ -86,17 +86,18 @@
   color: var(--text-subtle);
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
 .edit-tab:hover {
+  background-color: var(--surface-hover);
   color: var(--text);
 }
 
 .edit-tab.active {
-  color: var(--brand-primary);
+  color: var(--text);
 }
 
 .edit-tab.active::after {
@@ -106,7 +107,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background-color: var(--brand-primary);
+  background-color: var(--text);
 }
 
 /* Body Wrapper - Two Column Layout */
@@ -125,7 +126,7 @@
   overflow: visible;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
 /* Panel Containers (Form, Availability, Price) */
@@ -186,7 +187,7 @@
 
 .menu-item-form-content {
   padding: 16px;
-  gap: 24px;
+  gap: 12px;
 }
 
 /* Scoped overrides to avoid global conflicts and clipping inside modal */
@@ -211,23 +212,150 @@
   overflow: visible;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
+}
+
+/* Zero bottom-margins inside form content (Basic + Booking Rules) */
+.menu-item-form-panel .menu-item-form-content * {
+  margin-bottom: 0;
+}
+
+/* Radio Options for Booking Windows */
+.radio-options {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-option:hover {
+  background-color: var(--surface-raised);
+}
+
+.radio-option.active {
+  background-color: var(--purple-surface);
+  border-color: var(--purple-border);
+}
+
+.radio-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.radio-label {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.radio-description {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-subtle);
+  line-height: 1.4;
+}
+
+/* Meal Period Container */
+.meal-period-container {
+  padding: 16px;
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meal-period-label {
+  font-weight: 500;
+}
+
+.meal-period-description {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Preview Box */
+.preview-box {
+  padding: 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--text-subtle);
+  line-height: 1.5;
+}
+
+.preview-box strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Input Label */
+.input-label {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  font-size: 14px;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+/* Config Section (for Booking Windows) */
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.config-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-section .edit-field-row {
+  width: 262px;
 }
 
 /* Form Divider */
 .form-divider {
   height: 1px;
   background-color: var(--border);
-  margin: 16px 0;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 /* Form Fields */
 .form-field {
-  margin-bottom: 16px;
-}
-
-.form-field:last-child {
-  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
 }
 
 .form-field-row {
@@ -241,20 +369,20 @@
   margin-bottom: 0;
 }
 
-/* Remove margin-bottom from form-field when inside flex container */
-.menu-item-form-content .form-field {
-  margin-bottom: 0;
-}
+/* Form fields use gap-based spacing */
 
 .menu-item-form-content .edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 0;
 }
 
 /* Field Row - Horizontal Layout */
 .edit-field-row {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  gap: 12px;
+  align-items: center;
   width: 100%;
 }
 
@@ -263,29 +391,17 @@
   min-width: 0;
 }
 
-/* Gap between label and input/select/textarea */
-.form-label + .edit-input,
-.form-label + .edit-select,
-.form-label + .edit-textarea,
-.form-label + .edit-input-with-lang,
-.form-label + .edit-currency-input,
-.form-label + .edit-toggle-group {
-  margin-top: 8px;
-}
+/* Gap between label and input/select/textarea - handled by .form-field gap, no margin needed */
 
-/* Sublabel spacing: label → sublabel → control */
-.form-label + .edit-sublabel {
-  margin-top: 4px;
-}
+/* Sublabel spacing: label → sublabel → control - handled by form-label-group gap, no margin needed */
 
-.edit-sublabel + .edit-select,
-.edit-sublabel + .edit-input,
-.edit-sublabel + .edit-textarea {
-  margin-top: 8px;
-}
+/* Sublabel to control spacing - handled by parent gap, no margin needed */
 
 .form-label-group {
-  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0;
 }
 
 .edit-field-header {
@@ -294,9 +410,7 @@
   justify-content: space-between;
 }
 
-.edit-field-header + .edit-toggle-group {
-  margin-top: 8px;
-}
+/* edit-field-header to toggle-group spacing - handled by parent gap, no margin needed */
 
 /* Unified form label */
 .form-label {
@@ -322,7 +436,7 @@
 .form-help-text {
   font-size: 14px;
   color: var(--text-subtle);
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 /* Inputs */
@@ -330,7 +444,8 @@
 .edit-textarea,
 .edit-select {
   width: 100%;
-  padding: 10px 12px;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--field);
@@ -338,6 +453,32 @@
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 14px;
   transition: all 0.2s ease;
+}
+
+.edit-input {
+  line-height: 40px;
+}
+
+/* Hide number input spinners */
+.edit-input[type="number"]::-webkit-inner-spin-button,
+.edit-input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.edit-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.edit-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding: 10px 36px 10px 12px;
+  line-height: 1.4;
+  cursor: pointer;
 }
 
 .edit-input:focus,
@@ -358,16 +499,7 @@
   resize: vertical;
   line-height: 1.5;
   min-height: 100px;
-}
-
-.edit-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-  padding-right: 36px;
-  cursor: pointer;
+  height: auto;
 }
 
 /* Input with Language Selector */
@@ -435,6 +567,69 @@
 
 .edit-input-currency {
   padding-left: 58px;
+}
+
+/* Percent Input */
+.edit-percent-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.edit-percent-suffix {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 8px;
+  background-color: var(--neutral-surface);
+  color: var(--neutral-text);
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.edit-input-percent {
+  padding-right: 58px;
+}
+
+/* Payment Type Buttons */
+.payment-type-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.payment-type-button {
+  padding: 10px 16px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.payment-type-button:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-active);
+}
+
+.payment-type-button.active {
+  background-color: var(--brand-primary);
+  color: var(--brand-primary-text);
+  border-color: var(--brand-primary);
 }
 
 /* Status Dropdown */
@@ -598,23 +793,23 @@
 
 /* Bare brand-styled inline buttons */
 .edit-inline-button {
-  background: none;
-  border: none;
-  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0 12px;
   cursor: pointer;
-  color: var(--brand-primary);
+  color: var(--text);
   font-size: 14px;
   font-weight: 500;
-  height: 36px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   transition: all 0.2s ease;
+  width: fit-content;
 }
 
 .edit-inline-button:hover {
-  color: var(--brand-primary-hover);
   background-color: var(--surface-hover);
 }
 
@@ -695,6 +890,18 @@
   cursor: pointer;
 }
 
+/* Checkbox with spacing */
+.edit-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.edit-checkbox-spaced {
+  margin: 0;
+}
+
 /* Ghost Buttons */
 .edit-ghost-buttons {
   display: flex;
@@ -703,7 +910,8 @@
 }
 
 .edit-ghost-button {
-  padding: 10px 16px;
+  height: 40px;
+  padding: 0 16px;
   background: none;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -712,6 +920,9 @@
   font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .edit-ghost-button:hover {
@@ -782,19 +993,22 @@
 
 .preview-card-content {
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .preview-card-title {
   font-size: 16px;
   font-weight: 500;
   color: var(--text);
-  margin: 0 0 4px 0;
+  margin: 0;
 }
 
 .preview-card-tagline {
   font-size: 14px;
   color: var(--text-subtle);
-  margin: 0 0 16px 0;
+  margin: 0;
   line-height: 1.5;
 }
 
@@ -838,7 +1052,7 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
-  margin: 0;
+  margin: 0 0 8px 0;
 }
 
 .preview-actions-link {
@@ -847,6 +1061,7 @@
   font-family: 'IBM Plex Sans', monospace;
   word-break: break-all;
   line-height: 1.4;
+  margin-bottom: 12px;
 }
 
 /* Preview Actions */
@@ -886,7 +1101,7 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .edit-modal-container {
-    max-width: 100%;
+    max-width: 988px;
   }
 
   .edit-modal-body-wrapper {
@@ -955,9 +1170,408 @@
   background-color: var(--surface-hover);
 }
 
+/* Booking Rules Specific Styles */
+.availability-container {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.flush-row {
+  margin-bottom: 0;
+}
+
+.flush-row:not(:last-child) {
+  margin-bottom: 0;
+}
+
+.booking-rules-row {
+  margin-bottom: 0;
+}
+
+/* Reduce gap for flush-row fields in Cancel Fees, Show Dates, Valid Dates sections */
+.edit-field-row.flush-row {
+  gap: 4px;
+}
+
+/* Reduce gap for Turnovers section */
+.booking-rules-row .edit-field-row {
+  gap: 4px;
+}
+
+.booking-rules-delete-btn {
+  background: var(--danger-surface);
+  border: 1px solid var(--danger-border);
+  color: var(--text-subtle);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  height: 40px;
+  width: 40px;
+}
+
+.booking-rules-delete-btn:hover {
+  background: var(--danger-surface);
+  color: var(--text-subtle);
+  border-color: var(--danger-border);
+}
+
+.booking-rules-delete-btn svg {
+  color: var(--text-subtle);
+}
+
+/* Time Picker Styles */
+.time-picker-container {
+  position: relative;
+  width: 100%;
+}
+
+.time-picker-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--field);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  line-height: 40px;
+}
+
+.time-picker-input:focus {
+  outline: none;
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+/* Date Picker Styles */
+.date-picker-container {
+  position: relative;
+  width: 100%;
+}
+
+.date-picker-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--field);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  line-height: 40px;
+}
+
+.date-picker-input:focus {
+  outline: none;
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.date-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 280px;
+}
+
+.date-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.date-picker-nav {
+  background: none;
+  border: none;
+  color: var(--text-subtle);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.date-picker-nav:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.date-picker-month-year {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.date-picker-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-subtle);
+  padding: 8px 4px;
+}
+
+.date-picker-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px;
+  gap: 2px;
+}
+
+.calendar-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+  background: var(--surface-hover);
+}
+
+.calendar-day.today {
+  background: var(--brand-primary);
+  color: var(--brand-primary-text);
+}
+
+.calendar-day.selected {
+  background: var(--brand-primary);
+  color: var(--brand-primary-text);
+  font-weight: 500;
+}
+
+.calendar-day.empty {
+  cursor: default;
+  visibility: hidden;
+}
+
+/* Multi-Select Dropdown Styles */
+.multi-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.multi-select-button {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--field);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.multi-select-button:hover {
+  border-color: var(--border-active);
+}
+
+.multi-select-button:focus {
+  outline: none;
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.multi-select-button.open {
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.multi-select-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multi-select-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 260px;
+  overflow: hidden;
+}
+
+.multi-select-dropdown.above {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
+.multi-select-search {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.multi-select-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--field);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.multi-select-search-input:focus {
+  outline: none;
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.multi-select-actions {
+  display: flex;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.multi-select-action {
+  background: none;
+  border: none;
+  color: var(--link);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.multi-select-action:hover {
+  background: var(--surface-hover);
+  color: var(--link-hover);
+}
+
+.multi-select-options {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.multi-select-option:hover {
+  background: var(--surface-hover);
+}
+
+.multi-select-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  cursor: pointer;
+  accent-color: var(--brand-primary);
+}
+
+.multi-select-option-label {
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.multi-select-no-options {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-subtle);
+  font-size: 14px;
+}
+
+/* Star Rating Selector Styles */
+.star-rating-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.star-rating-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star-rating-star {
+  background: none;
+  border: none;
+  color: var(--text-subtle);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-rating-star:hover {
+  color: var(--warning-text);
+  background: var(--warning-surface);
+}
+
+.star-rating-star.selected {
+  color: var(--warning-text);
+}
+
+.star-rating-star:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.star-rating-description {
+  font-size: 14px;
+  color: var(--text-subtle);
+  font-style: italic;
+}
+
 @media (max-width: 768px) {
   .edit-modal-container {
-    max-width: 100%;
+    max-width: 988px;
     max-height: 100vh;
     border-radius: 0;
   }
@@ -983,4 +1597,36 @@
   .edit-field-row {
     flex-direction: column;
   }
+
+  .booking-rules-row .edit-field-row {
+    flex-direction: column;
+  }
+
+  .date-picker-dropdown {
+    left: -50%;
+    right: -50%;
+    min-width: 280px;
+  }
+}
+
+/* Booking Rules Banner */
+.booking-rules-banner {
+  background: var(--info-surface);
+  border: 1px solid var(--info-border);
+  border-radius: 4px;
+  padding: 12px 16px;
+}
+
+.booking-rules-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--info-text);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.booking-rules-banner-content svg {
+  flex-shrink: 0;
+  color: var(--info-text);
 }

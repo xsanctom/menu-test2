@@ -55,8 +55,8 @@ function ColumnVisibilityDropdown({ visibleColumns, onToggleColumn }) {
 
       {isOpen && (
         <div className="columns-dropdown">
-          <div className="columns-dropdown-header">Show Columns</div>
           <div className="columns-list">
+            <div className="columns-list-title">Show Columns</div>
             {ALL_COLUMNS.filter(col => !col.fixed).map((column) => (
               <label key={column.id} className="column-option">
                 <input

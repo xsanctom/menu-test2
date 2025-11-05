@@ -25,6 +25,18 @@ html, body {
     flex-direction: column;
 }
 
+/* Hide spinner arrows on all number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* Top Header Bar (Dark) */
 .top-header {
     background-color: var(--grey-grey-900);
@@ -243,7 +255,7 @@ html, body {
 .venue-dropdown {
     position: absolute;
     top: 100%;
-    left: 8px;
+    left: 0;
     width: 300px;
     z-index: 1000;
     background-color: var(--surface-raised);
@@ -352,6 +364,41 @@ html, body {
 .venue-settings-button:hover {
     background-color: var(--surface-hover);
     color: var(--text);
+}
+
+/* Venue Search Input */
+.venue-search-container {
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.venue-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: var(--surface);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.venue-search-input:focus {
+    outline: none;
+    border-color: var(--border-active);
+}
+
+.venue-search-input::placeholder {
+    color: var(--text-placeholder);
+}
+
+/* Venue No Matches Placeholder */
+.venue-no-matches {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--text-subtle);
+    font-size: 14px;
 }
 
 .search-container {
@@ -1192,84 +1239,6 @@ html, body {
     margin: 4px 0;
 }
 
-/* Sort Dropdown */
-.sort-dropdown {
-    position: relative;
-}
-
-.sort-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    height: 40px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--surface);
-    color: var(--text);
-    font-family: "IBM Plex Sans", sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.sort-button:hover {
-    background: var(--surface-hover);
-}
-
-.sort-options {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    z-index: 1000;
-    background: var(--surface-raised);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    min-width: 160px;
-    padding: 4px;
-}
-
-.sort-option {
-    padding: 4px 8px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: var(--text);
-    font-family: "IBM Plex Sans", sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-}
-
-.sort-option:hover {
-    background: var(--surface-hover);
-}
-
-.sort-option.active {
-    background-color: var(--surface-raised-active);
-    color: var(--text-active);
-}
-
-.sort-select {
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background-color: var(--surface);
-    color: var(--text);
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.sort-select:focus {
-    outline: none;
-    border-color: var(--border-active);
-}
-
 /* Filter Panel */
 .filter-panel {
     position: absolute;
@@ -1381,6 +1350,12 @@ html, body {
     color: var(--text);
 }
 
+.filter-option-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+}
+
 .filter-divider {
     height: 1px;
     background-color: var(--border);
@@ -1429,7 +1404,7 @@ html, body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background-color: var(--text);
     border-radius: 1px 1px 0 0;
 }
@@ -1567,7 +1542,7 @@ html, body {
 /* Fixed Columns Section */
 .fixed-columns {
     display: grid;
-    grid-template-columns: 32px 32px 200px 60px 40px;
+    grid-template-columns: 32px 32px 200px 40px 60px;
     align-items: center;
     min-height: inherit;
     background-color: transparent; /* Allow hover background to show through */
@@ -2858,21 +2833,22 @@ input:focus-visible,
     padding: 12px;
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
 .card-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
-    margin: 0 0 4px 0;
+    margin: 0;
     flex: 1;
 }
 
 .card-description {
     font-size: 14px;
     color: var(--text-subtle);
-    line-height: 1.4;
-    margin: 0 0 4px 0;
+    line-height: 1.5;
+    margin: 0;
 }
 
 
@@ -3466,7 +3442,7 @@ input:focus-visible,
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-top: 0;
     margin-bottom: 0;
 }
 
@@ -3673,6 +3649,39 @@ input:focus-visible,
     gap: 24px;
 }
 
+.section-header-collapsible {
+    background-color: var(--surface-raised);
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    padding: 12px 16px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    outline: none;
+    transition: background-color 0.2s ease;
+}
+
+.section-header-collapsible:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.section-header-collapsible:hover {
+    background-color: var(--surface-hover);
+}
+
+.section-header-collapsible:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 .section-header-content {
     display: flex;
     flex-direction: column;
@@ -3852,8 +3861,11 @@ input:focus-visible,
 }
 
 .radio-option span {
-    font-size: 14px;
     color: var(--text);
+}
+
+.radio-option .radio-label {
+    font-size: 14px;
 }
 
 /* Toggle Switch Section */
@@ -4355,31 +4367,36 @@ input:focus-visible,
     overflow-y: auto;
 }
 
-.columns-dropdown-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--text);
+.columns-list {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.columns-list {
-    padding: 8px 0;
+.columns-list-title {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-subtle);
+    margin: 0;
 }
 
 .column-option {
     display: flex;
     align-items: center;
-    padding: 8px 16px;
+    gap: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    padding: 4px 0;
 }
 
 .column-option:hover {
-    background-color: var(--surface-hover);
+    background-color: transparent;
 }
 
 .column-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand-primary);
     margin-right: 8px;
     cursor: pointer;
 }

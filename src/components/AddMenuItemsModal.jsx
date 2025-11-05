@@ -214,7 +214,7 @@ function AddMenuItemsModal({ onClose }) {
                           color: 'var(--text-subtle)',
                           fontSize: '14px',
                         }}>
-                          $
+                          ¥ 
                         </span>
                         <input
                           type="number"

@@ -1,14 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useMenu } from '../context/MenuContext';
 
 function PageHeader({ activeTab, setActiveTab, onOpenAddItemsModal, onOpenMenuItemModal }) {
   const [newMenuOpen, setNewMenuOpen] = useState(false);
+  const newMenuDropdownRef = useRef(null);
+
+  // Handle outside click for new menu dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (newMenuDropdownRef.current && !newMenuDropdownRef.current.contains(event.target)) {
+        setNewMenuOpen(false);
+      }
+    };
+
+    if (newMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [newMenuOpen]);
 
   return (
     <div className="page-header">
       <div className="page-header-content">
         <div className="page-title-section">
-          <h1 className="page-title">Menus</h1>
+          <h1 className="page-title">Menu</h1>
           
           {/* Tabs */}
           <div className="page-tabs">
@@ -43,7 +61,7 @@ function PageHeader({ activeTab, setActiveTab, onOpenAddItemsModal, onOpenMenuIt
             </svg>
           </button>
           {/* New Menu Dropdown */}
-          <div className="new-menu-dropdown">
+          <div className="new-menu-dropdown" ref={newMenuDropdownRef}>
             <button
               className="button primary"
               onClick={() => setNewMenuOpen(!newMenuOpen)}

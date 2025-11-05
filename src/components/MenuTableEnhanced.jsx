@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useMenu } from '../context/MenuContext';
 
 function MenuTableEnhanced({ onEditItem, visibleColumns = [] }) {
-  const { state, deleteMenuItem, toggleItemSelection, setSelectedItems } = useMenu();
+  const { state, deleteMenuItem, toggleItemSelection, setSelectedItems, archiveMenuItem, unarchiveMenuItem } = useMenu();
   const [openMenuId, setOpenMenuId] = useState(null);
   const [hoveredRowId, setHoveredRowId] = useState(null);
   const menuRef = useRef(null);
@@ -15,9 +15,26 @@ function MenuTableEnhanced({ onEditItem, visibleColumns = [] }) {
         return false;
       }
 
-      // Status filter
-      if (state.filters.status.length > 0 && !state.filters.status.includes(item.status)) {
-        return false;
+      // Status filter - handle archived status specially
+      const statusFilters = state.filters.status || [];
+      const isArchived = item.status === 'Archived';
+      const hasArchivedFilter = statusFilters.includes('Archived');
+      const hasOtherStatusFilters = statusFilters.some(s => s !== 'Archived');
+
+      if (isArchived) {
+        // Archived items only show when Archived filter is active
+        if (!hasArchivedFilter) {
+          return false;
+        }
+      } else {
+        // Non-archived items: if Archived filter is active, exclude them
+        // If other status filters are active, check if item matches
+        if (hasArchivedFilter) {
+          return false;
+        }
+        if (hasOtherStatusFilters && !statusFilters.includes(item.status)) {
+          return false;
+        }
       }
 
       // Category filter
@@ -175,6 +192,95 @@ function MenuTableEnhanced({ onEditItem, visibleColumns = [] }) {
                       {item.name}
                     </div>
                     
+                    {/* Overflow Menu */}
+                    <div className="cell-actions">
+                      <div className="overflow-menu-wrapper" ref={openMenuId === item.id ? menuRef : null}>
+                        <button 
+                          className="overflow-menu-button"
+                          onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
+                          title="More options"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                        </button>
+                        
+                        {openMenuId === item.id && (
+                          <div className="overflow-menu-dropdown">
+                            {item.status === 'Archived' ? (
+                              <>
+                                {/* Archived items: Only Audit Trail and Unarchive */}
+                                <button className="overflow-menu-item" onClick={() => setOpenMenuId(null)}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                  </svg>
+                                  Audit trail
+                                </button>
+                                <div className="overflow-menu-divider"></div>
+                                <button 
+                                  className="overflow-menu-item" 
+                                  onClick={() => { 
+                                    unarchiveMenuItem(item.id); 
+                                    setOpenMenuId(null); 
+                                  }}
+                                >
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M3 15v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                  </svg>
+                                  Unarchive
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                {/* Non-archived items: Full menu */}
+                                <button className="overflow-menu-item" onClick={() => { onEditItem(item.id); setOpenMenuId(null); }}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                  </svg>
+                                  Edit
+                                </button>
+                                <button className="overflow-menu-item" onClick={() => setOpenMenuId(null)}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                  </svg>
+                                  Copy
+                                </button>
+                                <button className="overflow-menu-item" onClick={() => setOpenMenuId(null)}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                  </svg>
+                                  Audit trail
+                                </button>
+                                <div className="overflow-menu-divider"></div>
+                                <button 
+                                  className="overflow-menu-item overflow-menu-item-danger" 
+                                  onClick={() => { 
+                                    if (window.confirm('Archive this menu item?')) {
+                                      archiveMenuItem(item.id);
+                                    }
+                                    setOpenMenuId(null); 
+                                  }}
+                                >
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                  </svg>
+                                  Archive
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
                     {/* Image */}
                     {isColumnVisible('image') && (
                       <div className="cell-image">
@@ -185,56 +291,6 @@ function MenuTableEnhanced({ onEditItem, visibleColumns = [] }) {
                         )}
                       </div>
                     )}
-                    
-                    {/* Overflow Menu */}
-                    <div className="cell-actions">
-                      <div className="overflow-menu-wrapper" ref={openMenuId === item.id ? menuRef : null}>
-                        <button 
-                          className="overflow-menu-button"
-                          onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="1"></circle>
-                            <circle cx="12" cy="5" r="1"></circle>
-                            <circle cx="12" cy="19" r="1"></circle>
-                          </svg>
-                        </button>
-                        
-                        {openMenuId === item.id && (
-                          <div className="overflow-menu-dropdown">
-                            <button className="overflow-menu-item" onClick={() => { onEditItem(item.id); setOpenMenuId(null); }}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                              </svg>
-                              Edit
-                            </button>
-                            <button className="overflow-menu-item" onClick={() => setOpenMenuId(null)}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                              </svg>
-                              Copy
-                            </button>
-                            <button className="overflow-menu-item" onClick={() => setOpenMenuId(null)}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                              </svg>
-                              Audit trail
-                            </button>
-                            <div className="overflow-menu-divider"></div>
-                            <button className="overflow-menu-item overflow-menu-item-danger" onClick={() => { deleteMenuItem(item.id); setOpenMenuId(null); }}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                              </svg>
-                              Archive
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -251,7 +307,15 @@ function MenuTableEnhanced({ onEditItem, visibleColumns = [] }) {
             {isColumnVisible('price') && <div className="cell-column">Price</div>}
             {isColumnVisible('status') && <div className="cell-column">Status</div>}
             {isColumnVisible('tagline') && <div className="cell-column">Tagline</div>}
-            {(isColumnVisible('meals') || isColumnVisible('days')) && <div className="cell-column-wide">Meals & Days</div>}
+            {(isColumnVisible('meals') || isColumnVisible('days')) && (
+              <div className="cell-column-wide">
+                {isColumnVisible('meals') && isColumnVisible('days') 
+                  ? 'Meals & Days'
+                  : isColumnVisible('meals') 
+                    ? 'Meals'
+                    : 'Days'}
+              </div>
+            )}
             {isColumnVisible('taxType') && <div className="cell-column">Tax Type</div>}
             {isColumnVisible('serviceFee') && <div className="cell-column">Service Fee</div>}
             {isColumnVisible('duration') && <div className="cell-column">Duration</div>}
@@ -295,7 +359,7 @@ function MenuTableEnhanced({ onEditItem, visibleColumns = [] }) {
                     {/* Price */}
                     {isColumnVisible('price') && (
                       <div className="cell-column">
-                        <span className="price">${item.price || '0'}</span>
+                        <span className="price">¥{item.price || '0'}</span>
                       </div>
                     )}
                     

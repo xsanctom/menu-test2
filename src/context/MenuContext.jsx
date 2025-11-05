@@ -18,9 +18,56 @@ export const ACTIONS = {
   SET_SORT: 'SET_SORT',
 };
 
+// Default booking rules structure
+const getDefaultBookingRules = () => ({
+  // Section 1: Duration & Meal Period
+  duration: {
+    value: null, // null = use venue default, otherwise stores selected option like "2hr", "30m"
+    extendToMealPeriod: false,
+  },
+  quantityLimit: null, // null = no limit
+  orderRules: {
+    minOrder: 0,
+    maxOrder: null, // null = unlimited
+    oneOrderPerPerson: false,
+  },
+  
+  // Section 2: Availability Windows
+  showDates: [], // Array of { startDate, endDate }
+  showStartTime: null,
+  validPeriod: {
+    dateRanges: [], // Array of { startDate, endDate }
+    startTime: null,
+    endTime: null,
+  },
+  
+  // Section 3: Booking Windows & Scheduling (New Structure)
+  furthestBooking: {
+    mode: 'daily', // 'daily' or 'monthly'
+    number: 2,
+    unit: 'months', // 'days' or 'months'
+  },
+  closestBooking: {
+    mode: 'same-day', // 'same-day' or 'advance'
+    timeIncrement: 60, // minutes for same-day mode
+    days: 1, // for advance mode
+  },
+  extendToMealEnd: false, // Single seating per meal period toggle
+  
+  // Section 4: Turnover Scheduling (Moved from Section 3)
+  turnovers: [], // Array of { startTime, latestStart, endTime }
+  
+  // Section 5: Targeting Rules
+  enabledLanguages: [],
+  tableTiers: [],
+});
+
 // Initial state
 const initialState = {
-  menuItems: menuItemsData.menuItems || [],
+  menuItems: (menuItemsData.menuItems || []).map(item => ({
+    ...item,
+    bookingRules: item.bookingRules || getDefaultBookingRules(),
+  })),
   viewMode: 'table', // 'table' or 'cards'
   selectedItems: [],
   filters: {
@@ -48,6 +95,7 @@ function menuReducer(state, action) {
         ...item,
         id: `item-${Date.now()}-${index}`,
         webId: `WEB-${Math.floor(Math.random() * 10000)}`,
+        bookingRules: item.bookingRules || getDefaultBookingRules(),
       }));
       return {
         ...state,
@@ -150,9 +198,23 @@ export function MenuProvider({ children }) {
       dispatch({ type: ACTIONS.UPDATE_MENU_ITEM, payload: { id, updates } });
       toast.success('Item updated successfully');
     },
+    bulkUpdateMenuItems: (ids, updates) => {
+      ids.forEach(id => {
+        dispatch({ type: ACTIONS.UPDATE_MENU_ITEM, payload: { id, updates } });
+      });
+      toast.success(`${ids.length} item${ids.length > 1 ? 's' : ''} updated successfully`);
+    },
     deleteMenuItem: (id) => {
       dispatch({ type: ACTIONS.DELETE_MENU_ITEM, payload: id });
       toast.success('Item deleted successfully');
+    },
+    archiveMenuItem: (id) => {
+      dispatch({ type: ACTIONS.UPDATE_MENU_ITEM, payload: { id, updates: { status: 'Archived' } } });
+      toast.success('Item archived successfully');
+    },
+    unarchiveMenuItem: (id) => {
+      dispatch({ type: ACTIONS.UPDATE_MENU_ITEM, payload: { id, updates: { status: 'Disabled' } } });
+      toast.success('Item unarchived successfully');
     },
     setViewMode: (mode) => dispatch({ type: ACTIONS.SET_VIEW_MODE, payload: mode }),
     toggleItemSelection: (id) => dispatch({ type: ACTIONS.TOGGLE_ITEM_SELECTION, payload: id }),

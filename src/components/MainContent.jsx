@@ -5,19 +5,22 @@ import MenuCardGrid from './MenuCardGrid';
 import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
 import BulkActionBar from './BulkActionBar';
 import FilterPanel from './FilterPanel';
+import BulkEditParameterModal from './BulkEditParameterModal';
+import BulkEditFormModal from './BulkEditFormModal';
 
 const DEFAULT_VISIBLE_COLUMNS = ['image', 'tagline', 'price', 'status', 'meals', 'days'];
 
 function MainContent({ onEditItem }) {
-  const { state, setViewMode, setSearch, deleteMenuItem, setSelectedItems } = useMenu();
+  const { state, setViewMode, setSearch, deleteMenuItem, setSelectedItems, bulkUpdateMenuItems } = useMenu();
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
-  const [sortBy, setSortBy] = useState('name');
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const saved = localStorage.getItem('visibleColumns');
     return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_COLUMNS;
   });
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [isParameterModalOpen, setIsParameterModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [selectedParameter, setSelectedParameter] = useState(null);
 
   const handleSearch = (e) => {
     const query = e.target.value;
@@ -33,16 +36,52 @@ function MainContent({ onEditItem }) {
     localStorage.setItem('visibleColumns', JSON.stringify(newVisibleColumns));
   };
 
-  const handleBulkDelete = () => {
-    if (window.confirm(`Delete ${state.selectedItems.length} selected item(s)?`)) {
-      state.selectedItems.forEach(id => deleteMenuItem(id));
+  const handleBulkArchive = () => {
+    if (window.confirm(`Archive ${state.selectedItems.length} selected item(s)?`)) {
+      bulkUpdateMenuItems(state.selectedItems, { status: 'Archived' });
       setSelectedItems([]);
     }
   };
 
+  const handleBulkUnarchive = () => {
+    if (window.confirm(`Unarchive ${state.selectedItems.length} selected item(s)?`)) {
+      bulkUpdateMenuItems(state.selectedItems, { status: 'Disabled' });
+      setSelectedItems([]);
+    }
+  };
+
+  const isArchivedView = state.filters.status?.includes('Archived');
+
   const handleBulkEdit = () => {
-    // This will be implemented with BulkEditModal
-    alert('Bulk edit feature coming soon!');
+    setIsParameterModalOpen(true);
+  };
+
+  const handleSelectParameter = (parameter) => {
+    setSelectedParameter(parameter);
+    setIsParameterModalOpen(false);
+    setIsFormModalOpen(true);
+  };
+
+  const handleBulkSave = (itemIds, updates) => {
+    bulkUpdateMenuItems(itemIds, updates);
+    setIsFormModalOpen(false);
+    setSelectedParameter(null);
+    setSelectedItems([]);
+  };
+
+  const handleCloseParameterModal = () => {
+    setIsParameterModalOpen(false);
+  };
+
+  const handleCloseFormModal = () => {
+    setIsFormModalOpen(false);
+    setSelectedParameter(null);
+  };
+
+  const handleBackToParameterSelection = () => {
+    setIsFormModalOpen(false);
+    setSelectedParameter(null);
+    setIsParameterModalOpen(true);
   };
 
   const handleClearSelection = () => {
@@ -124,44 +163,6 @@ function MainContent({ onEditItem }) {
               onToggleColumn={handleToggleColumn}
             />
           )}
-          
-          {/* Sort Dropdown */}
-          <div className="sort-dropdown">
-            <button
-              className="sort-button"
-              onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="7" y1="12" x2="21" y2="12"></line>
-                <line x1="11" y1="18" x2="21" y2="18"></line>
-              </svg>
-              Sort: {sortBy === 'name' ? 'Name' : 'Price'}
-            </button>
-
-            {sortDropdownOpen && (
-              <div className="sort-options">
-                <div
-                  className={`sort-option ${sortBy === 'name' ? 'active' : ''}`}
-                  onClick={() => {
-                    setSortBy('name');
-                    setSortDropdownOpen(false);
-                  }}
-                >
-                  Name
-                </div>
-                <div
-                  className={`sort-option ${sortBy === 'price' ? 'active' : ''}`}
-                  onClick={() => {
-                    setSortBy('price');
-                    setSortDropdownOpen(false);
-                  }}
-                >
-                  Price
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -176,8 +177,27 @@ function MainContent({ onEditItem }) {
       <BulkActionBar
         selectedCount={state.selectedItems.length}
         onBulkEdit={handleBulkEdit}
-        onBulkDelete={handleBulkDelete}
+        onBulkArchive={handleBulkArchive}
+        onBulkUnarchive={handleBulkUnarchive}
+        isArchivedView={isArchivedView}
         onClearSelection={handleClearSelection}
+      />
+
+      {/* Bulk Edit Modals */}
+      <BulkEditParameterModal
+        isOpen={isParameterModalOpen}
+        onClose={handleCloseParameterModal}
+        selectedCount={state.selectedItems.length}
+        onSelectParameter={handleSelectParameter}
+      />
+
+      <BulkEditFormModal
+        isOpen={isFormModalOpen}
+        onClose={handleCloseFormModal}
+        onBack={handleBackToParameterSelection}
+        selectedParameter={selectedParameter}
+        selectedItemIds={state.selectedItems}
+        onSave={handleBulkSave}
       />
     </div>
   );

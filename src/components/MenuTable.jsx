@@ -86,7 +86,7 @@ function MenuTable({ onEditItem }) {
                       )}
                     </td>
                     <td>{item.description || '-'}</td>
-                    <td className="price">${item.price || '0'}</td>
+                    <td className="price">¥{item.price || '0'}</td>
                     <td>
                       <span className="category-tag">{item.category}</span>
                     </td>
