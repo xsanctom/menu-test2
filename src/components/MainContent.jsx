@@ -104,10 +104,13 @@ function MainContent({ onEditItem }) {
               onClick={() => setViewMode('table')}
               title="Table view"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <circle cx="3" cy="6" r="1" strokeWidth="1.5"></circle>
+                <circle cx="3" cy="12" r="1" strokeWidth="1.5"></circle>
+                <circle cx="3" cy="18" r="1" strokeWidth="1.5"></circle>
               </svg>
             </button>
             <button

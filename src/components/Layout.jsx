@@ -48,6 +48,10 @@ function Layout() {
             setActiveTab={setActiveTab}
             onOpenAddItemsModal={() => setIsAddItemsModalOpen(true)}
             onOpenMenuItemModal={() => handleOpenEditItemModal()}
+            onOpenCategoryModal={() => {
+              // TODO: Implement category creation modal
+              console.log('Category creation not yet implemented');
+            }}
           />
           {renderContent()}
         </div>
