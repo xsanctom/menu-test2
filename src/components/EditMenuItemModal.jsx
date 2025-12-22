@@ -33,34 +33,14 @@ const LANGUAGES = [
   { value: 'th', label: 'Thai' },
 ];
 
-const ORDER_OPTIONS = [
-  { value: 0, label: '0' },
-  { value: 1, label: '1' },
-  { value: 2, label: '2' },
-  { value: 3, label: '3' },
-  { value: 4, label: '4' },
-  { value: 5, label: '5' },
-  { value: 6, label: '6' },
-  { value: 7, label: '7' },
-  { value: 8, label: '8' },
-  { value: 9, label: '9' },
-  { value: 10, label: '10+' },
+const MIN_ORDER_OPTIONS = [
+  { value: 0, label: 'No minimum' },
+  ...Array.from({ length: 25 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))
 ];
 
 const MAX_ORDER_OPTIONS = [
-  { value: 1, label: '1' },
-  { value: 2, label: '2' },
-  { value: 3, label: '3' },
-  { value: 4, label: '4' },
-  { value: 5, label: '5' },
-  { value: 6, label: '6' },
-  { value: 7, label: '7' },
-  { value: 8, label: '8' },
-  { value: 9, label: '9' },
-  { value: 10, label: '10' },
-  { value: 15, label: '15' },
-  { value: 20, label: '20+' },
-  { value: null, label: 'Unlimited' },
+  { value: null, label: 'No maximum' },
+  ...Array.from({ length: 25 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))
 ];
 
 const TIME_UNITS = [
@@ -1322,27 +1302,11 @@ function EditMenuItemModal({ isOpen, onClose, itemId = null }) {
                 </div>
 
                 <div className="menu-item-form-content">
-                  {/* Quantity Limit */}
-                  <div className="form-field">
-                    <label className="form-label">Quantity Limit</label>
-                    <p className="form-help-text">Set a limited inventory for this item per day.</p>
-                    <input
-                      type="number"
-                      className="edit-input"
-                      placeholder="No limit"
-                      value={formData.bookingRules.quantityLimit || ''}
-                      onChange={(e) => handleBookingRulesChange('quantityLimit', null, e.target.value ? parseInt(e.target.value) : null)}
-                      min="1"
-                    />
-                  </div>
-
-                  <div className="form-divider"></div>
-
                   {/* Order Rules */}
-                    <div className="form-field">
-                      <label className="form-label">Order Rules</label>
-                      <p className="form-help-text">Set a minimum/maximum quantity of this item allowed per booking.</p>
-                      <div className="edit-field-row flush-row">
+                  <div className="form-field">
+                    <label className="form-label">Order Limit</label>
+                    <p className="form-help-text">Set a minimum/maximum quantity of this item allowed per booking.</p>
+                    <div className="edit-field-row flush-row">
                       <div className="edit-field">
                         <label className="edit-sublabel">Min order</label>
                         <select
@@ -1350,7 +1314,7 @@ function EditMenuItemModal({ isOpen, onClose, itemId = null }) {
                           value={formData.bookingRules.orderRules.minOrder}
                           onChange={(e) => handleBookingRulesChange('orderRules', 'minOrder', parseInt(e.target.value))}
                         >
-                          {ORDER_OPTIONS.map(option => (
+                          {MIN_ORDER_OPTIONS.map(option => (
                             <option key={option.value} value={option.value}>{option.label}</option>
                           ))}
                         </select>
@@ -1363,11 +1327,27 @@ function EditMenuItemModal({ isOpen, onClose, itemId = null }) {
                           onChange={(e) => handleBookingRulesChange('orderRules', 'maxOrder', e.target.value ? parseInt(e.target.value) : null)}
                         >
                           {MAX_ORDER_OPTIONS.map(option => (
-                            <option key={option.value || 'unlimited'} value={option.value || ''}>{option.label}</option>
+                            <option key={option.value || 'no-maximum'} value={option.value || ''}>{option.label}</option>
                           ))}
                         </select>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="form-divider"></div>
+
+                  {/* Quantity Limit */}
+                  <div className="form-field">
+                    <label className="form-label">Daily Quantity Limit</label>
+                    <p className="form-help-text">Set a limited inventory for this item per day across all bookings.</p>
+                    <input
+                      type="number"
+                      className="edit-input"
+                      placeholder="No limit"
+                      value={formData.bookingRules.quantityLimit || ''}
+                      onChange={(e) => handleBookingRulesChange('quantityLimit', null, e.target.value ? parseInt(e.target.value) : null)}
+                      min="1"
+                    />
                   </div>
 
                   <div className="form-divider"></div>
